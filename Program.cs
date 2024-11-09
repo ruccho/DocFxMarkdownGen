@@ -109,9 +109,12 @@ string? FileEscape(string? str)
     => str?.Replace("<", "`").Replace(">", "`").Replace(" ", "%20");
 
 string SourceLink(Item item)
-    => item.Source?.Remote == null
-        ? ""
-        : $"###### [View Source]({item.Source.Remote.Repo}/blob/{item.Source.Remote.Branch}/{item.Source.Remote.Path}#L{item.Source.StartLine + 1})";
+{
+    if (item.Source?.Remote == null) return "";
+    var repo = item.Source.Remote.Repo.AsSpan();
+    if (repo.EndsWith(".git")) repo = repo[..^".git".Length];
+    return $"###### [View Source]({repo}/blob/{item.Source.Remote.Branch}/{item.Source.Remote.Path}#L{item.Source.StartLine + 1})";
+}
 
 void Declaration(StringBuilder str, Item item)
 {
